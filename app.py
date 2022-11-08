@@ -1,9 +1,10 @@
 import os
+from typing import Dict, List, Tuple, Union, Optional
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 from marshmallow import ValidationError
 
-from models import RequestParams
+from models import QuerySchema
 from query_builder import query_builder
 
 app = Flask(__name__)
@@ -13,30 +14,30 @@ DATA_DIR = os.path.join(BASE_DIR, "data")
 
 
 @app.route("/perform_query", methods=['POST'])
-def perform_query():
-    query_1 = {
+def perform_query() -> Union[List[str], Tuple[Response, int]]:
+
+    query1: Dict[str, Optional[str]] = {
         'cmd': request.args.get('cmd1'),
         'value': request.args.get('value1')
     }
-
-    query_2 = {
+    query2: Dict[str, Optional[str]] = {
         'cmd': request.args.get('cmd2'),
         'value': request.args.get('value2')
     }
     try:
-        params = RequestParams(many=True).load(data=[query_1, query_2])
+        params: List[QuerySchema] = QuerySchema(many=True).load([query1, query2])
     except ValidationError as e:
         return jsonify(e.messages), 400
 
     result = None
     for query in params:
         result = query_builder(
-            cmd=query['cmd'],
-            value=query['value'],
+            cmd=query.cmd,
+            value=query.value,
             data=result
         )
 
-    return jsonify(result)
+    return jsonify(result), 200
 
 
 if __name__ == '__main__':

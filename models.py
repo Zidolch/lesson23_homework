@@ -1,16 +1,15 @@
-from marshmallow import Schema, fields, validates_schema, ValidationError
-
-VALID_CMD = (
-    'filter', 'map', 'unique', 'sort', 'limit'
-)
+from dataclasses import dataclass
+import marshmallow
+import marshmallow_dataclass
 
 
-class RequestParams(Schema):
-    cmd = fields.Str(required=True)
-    value = fields.Str(required=True)
+@dataclass
+class Query:
+    cmd: str
+    value: str
 
-    @validates_schema
-    def valid_cmd_params(self, values, *args, **kwargs):
-        if values['cmd'] not in VALID_CMD:
-            raise ValidationError('cmd содержит неверное значение')
-        return values
+    class Meta:
+        unknown = marshmallow.EXCLUDE
+
+
+QuerySchema = marshmallow_dataclass.class_schema(Query)
