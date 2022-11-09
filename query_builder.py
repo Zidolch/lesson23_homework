@@ -1,10 +1,10 @@
-from typing import Optional, Iterable, List, Callable, TypeGuard
 
+from typing import Optional, Iterable, List, Callable, TypeGuard, Dict
 from functions import filter_query, map_query, unique_query, sort_query, limit_query, regex_query
 
 FILE_NAME = 'data/apache_logs.txt'
 
-CMD_TO_FUNCTION = {
+CMD_TO_FUNCTION: Dict[str, Callable] = {
     'filter': filter_query,
     'map': map_query,
     'unique': unique_query,
